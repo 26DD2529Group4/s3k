@@ -5,7 +5,9 @@
 This is a copy of https://github.com/kth-step/s3k/tree/2026-sys-sec as part of the 2026 KTH Project Course on Operating Systems and Compiler Support for Security (DD22529).
 
 Students :  
-Lou REINA--KUNTZIGER
+Lou REINA--KUNTZIGER, Seerat Yasir
+
+// Seerats line in README.md
 
 ---
 
