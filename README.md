@@ -1,5 +1,14 @@
 # S3K - Safe and Secure Separation Kernel
 
+## Students
+
+This is a copy of https://github.com/kth-step/s3k/tree/2026-sys-sec as part of the 2026 KTH Project Course on Operating Systems and Compiler Support for Security (DD22529).
+
+Students :  
+Lou REINA--KUNTZIGER
+
+---
+
 [![CI Build](https://github.com/HAKarlsson/s3k/actions/workflows/build.yml/badge.svg)](https://github.com/HAKarlsson/s3k/actions/workflows/build.yml)
 
 S3K is an experimental bare-metal capability-based separation kernel for RISC-V, built for safety- and security-critical systems such as avionics.
