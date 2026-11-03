@@ -1,0 +1,49 @@
+#include "csr.h"
+#include "ipc.h"
+#include "lock.h"
+#include "mem.h"
+#include "mon.h"
+#include "pmp.h"
+#include "proc.h"
+#include "sched.h"
+#include "syscall.h"
+#include "tsl.h"
+
+// Define memory regions and permissions as constants
+#define RAM_PERM MEM_PERM_RWX
+#define RAM_BASE 0x80000000
+#define RAM_SIZE 0x10000000
+#define BOOT_RAM_SIZE  0x1000000
+
+// Define memory regions and permissions as constants
+#define UART_PERM MEM_PERM_RW
+#define UART_BASE 0x10000000
+#define UART_SIZE 0x20
+
+// Define memory regions and permissions as constants
+#define VIRTIO_PERM MEM_PERM_RW
+#define VIRTIO_BASE 0x10001000
+#define VIRTIO_SIZE 0x1000
+
+void kernel_init(void)
+{
+	mem_t init_mem[NUM_MEMORY_CAPS] = {
+		{.rwx = RAM_PERM,  .base = RAM_BASE,  .size = RAM_SIZE },
+		{.rwx = UART_PERM, .base = UART_BASE, .size = UART_SIZE},
+		{.rwx = VIRTIO_PERM, .base = VIRTIO_BASE, .size = VIRTIO_SIZE},
+	};
+
+	mem_init(init_mem);
+	tsl_init();
+	mon_init();
+	ipc_init();
+	sched_init();
+	lock_init();
+	proc_init(RAM_BASE);
+
+	mem_pmp_set((pid_t)1, S3K_BOOT_MEM_RAM_IDX, (pmp_slot_t)1, RAM_PERM, pmp_napot_encode(RAM_BASE, BOOT_RAM_SIZE));
+}
+
+void temporal_fence(void)
+{
+}

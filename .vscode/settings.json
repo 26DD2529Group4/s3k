@@ -1,0 +1,11 @@
+{
+	"mesonbuild.configureOptions": [
+		"--cross-file",
+		"${workspaceFolder}/cross/rv64imac.ini",
+		"--buildtype=debugoptimized"
+	],
+	"mesonbuild.configureOnOpen": true,
+	"mesonbuild.buildFolder": "builddir",
+	"C_Cpp.default.compileCommands": "/workspaces/s3k/builddir/compile_commands.json",
+	"C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild"
+}

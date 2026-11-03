@@ -1,0 +1,35 @@
+project('tutorial.07.ipc-noyield', 'c',
+	version: '0.1', 
+	meson_version: '>=1.1.0', 
+	default_options: [
+		'buildtype=debugoptimized',
+		'c_std=gnu11',
+	]
+)
+
+subdir('_mesonlib/tutorial_project')
+subdir('app1')
+subdir('app2')
+
+tutorial_app_elves = [app1_elf, app2_elf]
+tutorial_gdb_commands = [
+	'-ex', 'set confirm off',
+	'-ex', 'set pagination off',
+	'-ex', 'target extended-remote 10.100.0.1:3333',
+	'-ex', 'set *(int*)0x3001000 = 0x0f',
+	'-ex', 'set *(int*)0x3001010 = 0x1',
+	'-ex', 'load ' + app1_elf.full_path(),
+	'-ex', 'load ' + app2_elf.full_path(),
+	'-ex', 'load ' + s3k_elf.full_path(),
+	'-ex', 'add-symbol-file ' + app1_elf.full_path(),
+	'-ex', 'add-symbol-file ' + app2_elf.full_path(),
+	'-ex', 'add-symbol-file ' + s3k_elf.full_path(),
+	'-ex', 't 2',
+	'-ex', 'set $pc=0x10000000',
+	'-ex', 't 1',
+	'-ex', 'set $pc=0x10000000',
+	'-ex', 'continue',
+]
+tutorial_qemu_loader_cpus = [0]
+
+subdir('_mesonlib/tutorial_targets')
