@@ -2,7 +2,9 @@
 
 #include <stdio.h>
 
-extern void app2_init(void); // Function to initialize app2 (the server application)
+extern s3k_word_t app2_init(void); // Function to initialize app2 (the server application)
+extern void app2_change_cap(s3k_word_t man_idx, s3k_word_t slot, s3k_word_t cfree, s3k_word_t perm, s3k_word_t base,
+	      s3k_word_t size); // Function to change the capability of app2
 
 extern char __uart_base[]; // UART base address
 
@@ -25,7 +27,7 @@ int main(void)
 {
 	setup_uart(S3K_BOOT_MEM_UART_IDX);
 	s3k_sync();
-	printf("IPC Application \n");
+	printf("IPC Application with capability modification\n");
 	s3k_word_t code_man_idx = app2_init(); // Initialize the server application
 
 	// Set up IPC endpoints and grant permissions
