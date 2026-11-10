@@ -56,9 +56,9 @@ s3k_word_t app2_init(void)
 	// 			code memory configuration
 	// ##############################################
 	s3k_word_t b_code_base = APP2_RAM_ORIGIN;
-	s3k_word_t b_code_size = APP2_RAM_LENGTH;
+	s3k_word_t b_code_size = APP2_RAM_LENGTH / 2;
 	s3k_word_t b_code_perm = S3K_MEM_PERM_RX; // Read/Execute permissions
-	s3k_word_t b_code_slot = 1;
+	s3k_word_t b_code_slot = 2;
 	s3k_word_t b_code_fuel = 1;
 	
 	// first create the manager with fuel 2 in order to revoke the child capability later
@@ -84,11 +84,11 @@ s3k_word_t app2_init(void)
 	// ##############################################
 	// 			data memory configuration
 	// ##############################################
-	s3k_word_t b_stack_base = APP3_RAM_ORIGIN;
-	s3k_word_t b_stack_size = 64; // 64 bytes for stack
+	s3k_word_t b_stack_base = APP2_RAM_ORIGIN + APP2_RAM_LENGTH / 2; // Stack base address
+	s3k_word_t b_stack_size = APP2_RAM_LENGTH / 2; // 64 bytes for stack
 	s3k_word_t b_stack_perm = S3K_MEM_PERM_RW; // Read/Write permissions
+	s3k_word_t b_stack_slot = 3;
 	s3k_word_t b_stack_fuel = 1;
-	s3k_word_t b_stack_slot = 2;
 	mem_init(mon_idx, ram_idx, b_stack_slot, b_stack_fuel, b_stack_perm, b_stack_base, b_stack_size);
 
 	// ##############################################
@@ -97,8 +97,9 @@ s3k_word_t app2_init(void)
 	s3k_word_t uart_base = (s3k_word_t)__uart_base;
 	s3k_word_t uart_size = 0x20;
 	s3k_word_t uart_perm = S3K_MEM_PERM_RW; // Read/Write permissions
+	s3k_word_t uart_slot = 4;
 	s3k_word_t uart_fuel = 1;
-	s3k_word_t uart_slot = 3;
+
 	mem_init(mon_idx, uart_idx, uart_slot, uart_fuel, uart_perm, uart_base, uart_size);
 
 	if (s3k_mon_reg_set(mon_idx, S3K_REG_PC, b_code_base) != 0) {

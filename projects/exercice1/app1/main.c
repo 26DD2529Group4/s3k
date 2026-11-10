@@ -21,13 +21,43 @@ void setup_uart(int idx) {
     return;
 }
 
+static s3k_word_t trap_stack[1024] __attribute__((aligned(16)));
+
+static void trap_handler(void) __attribute__((interrupt("machine")));
+static void trap_handler(void)
+{
+	setup_uart(S3K_BOOT_MEM_UART_IDX);
+
+	s3k_word_t epc = s3k_vreg_get(S3K_VREG_EPC);
+	s3k_word_t esp = s3k_vreg_get(S3K_VREG_ESP);
+	s3k_word_t ecause = s3k_vreg_get(S3K_VREG_ECAUSE);
+	s3k_word_t eval = s3k_vreg_get(S3K_VREG_EVAL);
+
+	printf("error info:\n- epc: 0x%lx\n- esp: 0x%lx\n- ecause: 0x%lx\n- eval: 0x%lx\n",
+			   epc, esp, ecause, eval);
+	printf("restoring pc and sp\n\n");
+}
+
+void setup_trap(void (*trap_handler)(void), void * trap_stack_base, uint64_t trap_stack_size)
+{
+	// Sets the trap handler
+	s3k_vreg_set(S3K_VREG_TPC, (uint64_t)trap_handler);
+	// Set the trap stack
+	s3k_vreg_set(S3K_VREG_TSP, ((uint64_t)trap_stack_base) + trap_stack_size);
+	printf("trap set up!\n");
+}
+
+
 
 #define PROC_STATE_BLOCKED 2
 int main(void)
 {
 	setup_uart(S3K_BOOT_MEM_UART_IDX);
+	setup_trap(trap_handler, trap_stack, 1024);
 	s3k_sync();
 	printf("IPC Application with capability modification\n");
+
+
 	s3k_word_t code_man_idx = app2_init(); // Initialize the server application
 
 	// Set up IPC endpoints and grant permissions

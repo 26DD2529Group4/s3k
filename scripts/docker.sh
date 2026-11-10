@@ -12,6 +12,6 @@ docker build --platform "$DOCKER_PLATFORM" -t "$IMAGE_NAME" -f "$REPO_ROOT/.devc
 
 docker run --platform "$DOCKER_PLATFORM" -it --rm \
 	-p "5555:5555" \
-	-v "$WORKSPACE:/workspace" \
+	-v "$WORKSPACE:/workspace:z" \
 	-w /workspace \
 	"$IMAGE_NAME"
