@@ -79,8 +79,6 @@ s3k_word_t app2_init(void)
 	// then derive the child capability for the code memory
 	mem_init(mon_idx, manager_idx, b_code_slot, b_code_fuel, b_code_perm, b_code_base, b_code_size);
 
-	
-
 	// ##############################################
 	// 			data memory configuration
 	// ##############################################
