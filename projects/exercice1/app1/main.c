@@ -26,7 +26,7 @@ int main(void)
 	setup_uart(S3K_BOOT_MEM_UART_IDX);
 	s3k_sync();
 	printf("IPC Application \n");
-	app2_init(); // Initialize the server application
+	s3k_word_t code_man_idx = app2_init(); // Initialize the server application
 
 	// Set up IPC endpoints and grant permissions
 	s3k_ipc_flag_t flags = S3K_IPC_FLAG_YIELD;
@@ -48,15 +48,13 @@ int main(void)
 	printf("Process 2 is ready to receive\n");
 
 	printf("call,replyrecv\n");
-	for (int i = 0; i < 100; ++i) {
-		s3k_sleep_until(0);				         // Synchronize to the next time slot
-		s3k_msg_t msg = {};
-		msg.capty = 0;
-		msg.capidx = 0;
-		msg.data[0] = i;
-		s3k_ipc_call(client, &msg);
-		printf("received %d\n", msg.data[0]); // Output results
-	}
+	s3k_sleep_until(0);				         // Synchronize to the next time slot
+	s3k_msg_t msg = {};
+	msg.capty = 0;
+	msg.capidx = 0;
+	msg.data[0] = 42; // Example data to send
+	s3k_ipc_call(client, &msg);
+	printf("received %d\n", msg.data[0]); // Output results
 
 	// Suspend server and client
 	s3k_mon_suspend(S3K_BOOT_MON_P2_IDX);
