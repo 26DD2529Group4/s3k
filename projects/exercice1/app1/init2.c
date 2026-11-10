@@ -52,14 +52,16 @@ s3k_word_t app2_init(void)
 	int ram_idx = S3K_BOOT_MEM_RAM_IDX;   // RAM index
 	int uart_idx = S3K_BOOT_MEM_UART_IDX; // UART index
 
-	// ##### code memory configuration #####
+	// ##############################################
+	// 			code memory configuration
+	// ##############################################
 	s3k_word_t b_code_base = APP2_RAM_ORIGIN;
 	s3k_word_t b_code_size = APP2_RAM_LENGTH;
 	s3k_word_t b_code_perm = S3K_MEM_PERM_RX; // Read/Execute permissions
 	s3k_word_t b_code_slot = 1;
 	s3k_word_t b_code_fuel = 1;
 	
-	// first create the manager in order to revoke the child capability later
+	// first create the manager with fuel 2 in order to revoke the child capability later
 	s3k_word_t manager_idx = s3k_mem_derive(ram_idx, 2, b_code_perm, b_code_base, b_code_size);
 	if (manager_idx < 0) {
 		printf("Failed to derive memory capability %lx\n", b_code_base);
@@ -67,10 +69,10 @@ s3k_word_t app2_init(void)
 	}
 	
 	// probably not needed since we are not using the capability to access the memory
-	// s3k_word_t addr = s3k_pmp_napot_encode(base, size);
-	// int err = s3k_mon_mem_pmp_set(mon_idx, idx, slot, perm, addr);
+	// s3k_word_t addr = s3k_pmp_napot_encode(b_code_base, b_code_size);
+	// int err = s3k_mem_pmp_set(manager_idx, 5, b_code_perm, addr);
 	// if (err < 0) {
-	// 	printf("Failed to set PMP for derived memory %lx, err=%d\n", base, err);
+	// 	printf("Failed to set PMP for derived memory %lx, err=%d\n", b_code_base, err);
 	// 	return -1;
 	// }
 
@@ -79,7 +81,9 @@ s3k_word_t app2_init(void)
 
 	
 
-	// ##### data (stack) memory configuration #####
+	// ##############################################
+	// 			data memory configuration
+	// ##############################################
 	s3k_word_t b_stack_base = APP3_RAM_ORIGIN;
 	s3k_word_t b_stack_size = 64; // 64 bytes for stack
 	s3k_word_t b_stack_perm = S3K_MEM_PERM_RW; // Read/Write permissions
@@ -87,7 +91,9 @@ s3k_word_t app2_init(void)
 	s3k_word_t b_stack_slot = 2;
 	mem_init(mon_idx, ram_idx, b_stack_slot, b_stack_fuel, b_stack_perm, b_stack_base, b_stack_size);
 
-	// ##### UART configuration #####
+	// ##############################################
+	// 				UART configuration
+	// ##############################################
 	s3k_word_t uart_base = (s3k_word_t)__uart_base;
 	s3k_word_t uart_size = 0x20;
 	s3k_word_t uart_perm = S3K_MEM_PERM_RW; // Read/Write permissions
