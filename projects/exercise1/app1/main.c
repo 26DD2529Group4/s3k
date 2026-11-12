@@ -66,27 +66,47 @@ int main(void)
 	int server = s3k_ipc_derive(S3K_BOOT_IPC_0, 2, mode, flags);	     // Derive server endpoint
 	int client = s3k_ipc_derive(server, 1, mode, flags); // Derive client endpoint
 
-	s3k_mon_ipc_grant(S3K_BOOT_MON_P2_IDX, server);		// Grant server endpoint to monitor 8
-	s3k_mon_reg_set(S3K_BOOT_MON_P2_IDX, S3K_REG_A0, server); // Set server endpoint in monitor 8's register
-	s3k_mon_resume(S3K_BOOT_MON_P2_IDX);			// Resume monitor 8 (server)
+	s3k_mon_ipc_grant(S3K_BOOT_MON_P2_IDX, server);
+	s3k_mon_reg_set(S3K_BOOT_MON_P2_IDX, S3K_REG_A0, server);
+	s3k_mon_resume(S3K_BOOT_MON_P2_IDX);
 
-	while (true) {
-		s3k_mon_yield(S3K_BOOT_MON_P2_IDX);			// Yield to monitor 8
-		uint64_t state;
-		s3k_mon_state_get(S3K_BOOT_MON_P2_IDX, &state);
-		if (state & PROC_STATE_BLOCKED)
-			break;
-	}
-	printf("Process 2 is ready to receive\n");
-
-	printf("call,replyrecv\n");
-	s3k_sleep_until(0);				         // Synchronize to the next time slot
 	s3k_msg_t msg = {};
 	msg.capty = 0;
 	msg.capidx = 0;
-	msg.data[0] = 42; // Example data to send
-	s3k_ipc_call(client, &msg);
-	printf("received %d\n", msg.data[0]); // Output results
+	msg.data[0] = 0;
+	while (true) {
+		s3k_mon_yield(S3K_BOOT_MON_P2_IDX);
+		uint64_t state;
+		s3k_mon_state_get(S3K_BOOT_MON_P2_IDX, &state);
+		if (state & PROC_STATE_BLOCKED) {
+			printf("app1> server is blocked, sending message to unblock...\n");
+			int err = s3k_ipc_call(client, &msg);
+			if (err < 0) {
+				printf("app1> IPC call failed with error: %d\n", err);
+			}
+			break;
+		}
+	}
+
+	printf("app1> received message from server : 0x%lx\n", msg.data[0]);
+	printf("app1> changing capability of app2 code region to RWX...\n");
+	app2_change_cap(code_man_idx, 2, 1, S3K_MEM_PERM_RWX, APP2_RAM_ORIGIN, APP2_RAM_LENGTH / 2);
+	printf("app1> capability changed\n");
+
+	// Send a message to the server to trigger the code overwrite
+	msg.data[0] = APP2_RAM_ORIGIN;
+	int err = s3k_ipc_call(client, &msg);
+	if (err < 0) {
+		printf("app1> IPC call failed with error: %d\n", err);
+	}
+
+	// trigger the server crash
+	for (int i = 0; i < 10; i++) {
+		s3k_sleep_until(0);
+		msg.data[0] = 0;
+		printf("app1> sending message %d to server to trigger crash...\n", i);
+		s3k_ipc_call(client, &msg);
+	}
 
 	// Suspend server and client
 	s3k_mon_suspend(S3K_BOOT_MON_P2_IDX);

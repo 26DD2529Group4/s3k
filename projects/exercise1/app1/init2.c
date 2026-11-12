@@ -23,7 +23,6 @@ void mem_init(s3k_word_t mon_idx, s3k_word_t idx, s3k_word_t slot, s3k_word_t cf
 
 }
 
-
 void app2_change_cap(s3k_word_t man_idx, s3k_word_t slot, s3k_word_t cfree, s3k_word_t perm, s3k_word_t base,
 	      s3k_word_t size)
 {
