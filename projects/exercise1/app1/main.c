@@ -100,14 +100,6 @@ int main(void)
 		printf("app1> IPC call failed with error: %d\n", err);
 	}
 
-	// trigger the server crash
-	for (int i = 0; i < 10; i++) {
-		s3k_sleep_until(0);
-		msg.data[0] = 0;
-		printf("app1> sending message %d to server to trigger crash...\n", i);
-		s3k_ipc_call(client, &msg);
-	}
-
 	// Suspend server and client
 	s3k_mon_suspend(S3K_BOOT_MON_P2_IDX);
 	s3k_mon_suspend(S3K_BOOT_MON_P1_IDX);
